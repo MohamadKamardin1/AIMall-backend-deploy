@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -o errexit
 
+
+/opt/render/project/src/.venv/bin/python -m pip install --upgrade pip
 # Upgrade pip and setuptools first
 pip install --upgrade pip setuptools wheel
 
