@@ -855,3 +855,13 @@ def admin_analytics(request):
     }
     
     return Response(analytics_data)
+
+
+
+
+# main app views.py (e.g., in your root app or core app)
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
+def home_view(request):
+    return render(request, 'home.html')
