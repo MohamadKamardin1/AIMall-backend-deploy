@@ -2,14 +2,20 @@
 # Exit on error
 set -o errexit
 
-# Install dependencies
+# Upgrade pip and dependencies first
+pip install --upgrade pip setuptools wheel
+
+# Install requirements
 pip install -r requirements.txt
+
+# If Pillow still fails, install it with specific flags as fallback
+if ! pip show pillow > /dev/null 2>&1; then
+    echo "Pillow installation failed, trying alternative approach..."
+    pip install pillow==10.0.1 --no-cache-dir
+fi
 
 # Collect static files
 python manage.py collectstatic --no-input
 
 # Apply database migrations
 python manage.py migrate
-
-# Create superuser if doesn't exist (optional - for initial setup)
-# echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@aimall.tz', 'admin123') if not User.objects.filter(username='admin').exists() else None" | python manage.py shell
