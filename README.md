@@ -40,7 +40,7 @@ AI Mall empowers **local vendors in Zanzibar** to:
 - 💰 **Set dynamic pricing** with auto-calculated profits  
 - 📊 **Manage listings** with a beautiful, responsive dashboard  
 - 🔒 **Stay private** — vendors **only see their own data**  
-- 🌍 **Sell across market zones** (Mwenge, Ilala, etc.)
+- 🌍 **Sell across market zones** (kwerekwe, kiembe samaki, etc.)
 
 Built with **African innovation** in mind — for Zanzibar, by Zanzibar.
 
@@ -109,5 +109,5 @@ For now, **run locally** (see installation below).
 
 1. **Clone the repo**
    ```bash
-   git clone https://github.com/your-username/AIMall.git
+   git clone https://github.com/MohamadKamardin1/AIMall.git
    cd AIMall
