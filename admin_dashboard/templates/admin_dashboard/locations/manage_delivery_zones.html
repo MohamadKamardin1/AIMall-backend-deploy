@@ -1,0 +1,95 @@
+<!-- admin_dashboard/templates/admin_dashboard/locations/manage_delivery_zones.html -->
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Delivery Zones - {{ market.name }}{% endblock %}
+{% block page_title %}Delivery Zones{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h5 class="title-medium">Delivery Zones for {{ market.name }}</h5>
+    <p class="body-medium text-muted">Configure delivery pricing by geographic area.</p>
+  </div>
+  <a href="{% url 'admin_dashboard:add-delivery-zone' market.id %}" class="btn btn-primary">
+    <i class="fas fa-plus me-1"></i> Add Zone
+  </a>
+</div>
+
+<div class="dashboard-card">
+  <div class="card-body p-0">
+    {% if zones %}
+      <div class="table-responsive">
+        <table class="data-table table mb-0">
+          <thead>
+            <tr>
+              <th>Zone</th>
+              <th>Base Fee</th>
+              <th>Pricing Mode</th>
+              <th>Status</th>
+              <th>Map</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for z in zones %}
+            <tr>
+              <td>
+                <div class="title-medium">{{ z.name }}</div>
+                <div class="body-small text-muted">{{ z.description|truncatewords:6 }}</div>
+              </td>
+              <td>Tsh {{ z.base_delivery_fee|floatformat:0 }}</td>
+              <td>
+                {% if z.is_manual_pricing and z.manual_delivery_fee %}
+                  <span class="chip chip-warning">Manual: Tsh {{ z.manual_delivery_fee|floatformat:0 }}</span>
+                {% else %}
+                  <span class="chip chip-primary">Distance-Based</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if z.is_active %}
+                  <span class="chip chip-success">Active</span>
+                {% else %}
+                  <span class="chip chip-error">Inactive</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if z.min_latitude and z.max_latitude and z.min_longitude and z.max_longitude %}
+                  <div style="width:120px; height:80px; border-radius:6px; overflow:hidden; background:#f5f5f5;">
+                    <!-- OpenStreetMap Static Image (Free, No API Key) -->
+                    <img 
+                      src="https://www.openstreetmap.org/staticmap?bbox={{ z.min_longitude|floatformat:6 }},{{ z.min_latitude|floatformat:6 }},{{ z.max_longitude|floatformat:6 }},{{ z.max_latitude|floatformat:6 }}&size=120x80&format=png"
+                      alt="Zone Map"
+                      class="w-100 h-100"
+                      style="object-fit: cover;"
+                      onerror="this.parentElement.innerHTML='<div class=\'d-flex align-items-center justify-content-center h-100 body-small text-muted\'>Map unavailable</div>'"
+                    >
+                  </div>
+                {% else %}
+                  <span class="body-small text-muted">No boundaries</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'admin_dashboard:edit-delivery-zone' z.id %}" class="btn btn-outline-primary btn-sm me-1">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="#" class="btn btn-outline-danger btn-sm"
+                   onclick="crudHelper.confirmDelete('{% url 'admin_dashboard:delete-delivery-zone' z.id %}', '{{ z.name }}'); return false;">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-truck"></i>
+        <p>No delivery zones configured for {{ market.name }}.</p>
+        <a href="{% url 'admin_dashboard:add-delivery-zone' market.id %}" class="btn btn-primary mt-2">Add First Zone</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

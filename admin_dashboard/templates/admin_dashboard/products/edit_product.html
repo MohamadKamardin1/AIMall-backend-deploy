@@ -1,0 +1,137 @@
+<!-- admin_dashboard/templates/admin_dashboard/products/edit_product.html -->
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Edit Product - {{ product.name }}{% endblock %}
+{% block page_title %}Edit Product Template{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h6 class="title-medium mb-0">Edit Product: "{{ product.name }}"</h6>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data" id="productForm">
+          {% csrf_token %}
+          
+          <!-- Product Name -->
+          <div class="mb-3">
+            <label class="form-label body-medium">Product Name *</label>
+            <input type="text" name="name" class="form-control" required value="{{ product.name }}" placeholder="e.g., Mangoes, Rice">
+          </div>
+
+          <!-- Category -->
+          <div class="mb-3">
+            <label class="form-label body-medium">Category *</label>
+            <select name="category" class="form-select" required>
+              <option value="">Select Category</option>
+              {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if product.category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Primary Unit Type -->
+          <div class="mb-3">
+            <label class="form-label body-medium">Primary Unit Type *</label>
+            <select name="primary_unit_type" class="form-select" required id="primaryUnitType">
+              <option value="">Select Unit Type</option>
+              {% for ut in unit_types %}
+                <option value="{{ ut.id }}" {% if product.primary_unit_type_id == ut.id %}selected{% endif %}>{{ ut.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Available Units -->
+          <div class="mb-3">
+            <label class="form-label body-medium">Available Units</label>
+            <div id="availableUnitsContainer" class="d-flex flex-wrap gap-2">
+              {% for group in unit_groups %}
+                <div class="mb-2">
+                  <strong class="body-small">{{ group.unit_type.name }}:</strong>
+                  {% for unit in group.units %}
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" name="available_units" value="{{ unit.id }}" id="unit_{{ unit.id }}"
+                             {% if unit in product.available_units.all %}checked{% endif %}>
+                      <label class="form-check-label body-small" for="unit_{{ unit.id }}">{{ unit.name }} ({{ unit.symbol }})</label>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-3">
+            <label class="form-label body-medium">Description</label>
+            <textarea name="description" class="form-control" rows="3" placeholder="Brief product description...">{{ product.description }}</textarea>
+          </div>
+
+          <!-- Search Keywords -->
+          <div class="mb-3">
+            <label class="form-label body-medium">Search Keywords</label>
+            <input type="text" name="search_keywords" class="form-control" placeholder="e.g., mango, sweet, local" value="{{ product.search_keywords }}">
+            <div class="form-text">Comma-separated keywords to improve search</div>
+          </div>
+
+          <!-- Active Toggle -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="is_active" id="is_active" {% if product.is_active %}checked{% endif %}>
+            <label class="form-check-label body-medium" for="is_active">Active (visible to customers)</label>
+          </div>
+
+          <!-- Submit -->
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-1"></i> Update Product
+            </button>
+            <a href="{% url 'admin_dashboard:product-detail' product.id %}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar: Image Upload -->
+  <div class="col-lg-4">
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h6 class="title-medium mb-0">Product Image</h6>
+      </div>
+      <div class="card-body">
+        <div class="mb-3 text-center">
+          <div id="imagePreview" class="mb-3" style="min-height: 150px; display: flex; align-items: center; justify-content: center; background: var(--surface-variant); border-radius: var(--border-radius);">
+            {% if product.main_image %}
+              <img src="{{ product.main_image.url }}" alt="Preview" class="img-fluid" style="max-height: 150px; object-fit: contain;">
+            {% else %}
+              <i class="fas fa-image fa-3x text-muted"></i>
+            {% endif %}
+          </div>
+          <input type="file" name="main_image" id="main_image" class="form-control" accept="image/*">
+          <div class="form-text body-small">Leave blank to keep current image</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Handle image preview
+document.getElementById('main_image').addEventListener('change', function(e) {
+  const preview = document.getElementById('imagePreview');
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.innerHTML = `<img src="${e.target.result}" alt="Preview" class="img-fluid" style="max-height: 150px; object-fit: contain;">`;
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// Note: For edit, we don't dynamically reload units (since data is already rendered)
+// If you want dynamic unit switching in edit mode, we can add JS — but it's not required
+</script>
+{% endblock %}

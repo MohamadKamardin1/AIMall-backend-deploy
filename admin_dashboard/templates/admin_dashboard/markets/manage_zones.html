@@ -1,0 +1,71 @@
+<!-- admin_dashboard/templates/admin_dashboard/markets/manage_zones.html -->
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Zones - {{ market.name }}{% endblock %}
+{% block page_title %}Market Zones: {{ market.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h5 class="title-medium">Zones in {{ market.name }}</h5>
+    <p class="body-medium text-muted">Manage market sections like "Fruits", "Vegetables", etc.</p>
+  </div>
+  <a href="{% url 'admin_dashboard:add-market-zone' market.id %}" class="btn btn-primary">
+    <i class="fas fa-plus me-1"></i> Add Zone
+  </a>
+</div>
+
+<div class="dashboard-card">
+  <div class="card-body p-0">
+    {% if zones %}
+      <div class="table-responsive">
+        <table class="data-table table mb-0">
+          <thead>
+            <tr>
+              <th>Zone Name</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Products</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for zone in zones %}
+            <tr>
+              <td class="title-medium">{{ zone.name }}</td>
+              <td>{{ zone.zone_type|default:"—" }}</td>
+              <td>{{ zone.description|truncatewords:8 }}</td>
+              <td>
+                {% if zone.is_active %}
+                  <span class="chip chip-success">Active</span>
+                {% else %}
+                  <span class="chip chip-error">Inactive</span>
+                {% endif %}
+              </td>
+              <td>{{ zone.products.count }}</td>
+              <td>
+                <a href="{% url 'admin_dashboard:edit-market-zone' zone.id %}" class="btn btn-outline-primary btn-sm me-1">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="#" class="btn btn-outline-danger btn-sm"
+                   onclick="crudHelper.confirmDelete('{% url 'admin_dashboard:delete-market-zone' zone.id %}', '{{ zone.name }}'); return false;">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-map-marker-alt"></i>
+        <p>No zones defined for this market.</p>
+        <a href="{% url 'admin_dashboard:add-market-zone' market.id %}" class="btn btn-primary mt-2">Add First Zone</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

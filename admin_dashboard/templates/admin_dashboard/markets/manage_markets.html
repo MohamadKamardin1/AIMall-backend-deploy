@@ -1,0 +1,151 @@
+<!-- admin_dashboard/templates/admin_dashboard/markets/manage_markets.html -->
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Markets - AI Mall Admin{% endblock %}
+{% block page_title %}Markets{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const ctx = document.getElementById('marketsChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Total Markets', 'Active Markets', 'Market Zones', 'Delivery Zones'],
+      datasets: [{
+        label: 'Count',
+        data: [
+          {{ total_markets }},
+          {{ active_markets }},
+          {{ total_zones }},
+          {{ total_delivery_zones }}
+        ],
+        backgroundColor: [
+          'rgba(46, 125, 50, 0.7)',
+          'rgba(76, 175, 80, 0.7)',
+          'rgba(33, 150, 243, 0.7)',
+          'rgba(156, 39, 176, 0.7)'
+        ],
+        borderColor: [
+          'rgba(46, 125, 50, 1)',
+          'rgba(76, 175, 80, 1)',
+          'rgba(33, 150, 243, 1)',
+          'rgba(156, 39, 176, 1)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { precision: 0 }
+        }
+      }
+    }
+  });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="dashboard-card p-3">
+      <div class="title-medium">Total Markets: {{ total_markets }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="dashboard-card p-3">
+      <div class="title-medium text-success">Active: {{ active_markets }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="dashboard-card p-3">
+      <div class="title-medium">Market Zones: {{ total_zones }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="dashboard-card p-3">
+      <div class="title-medium">Delivery Zones: {{ total_delivery_zones }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart -->
+<div class="dashboard-card mb-4">
+  <div class="card-header">
+    <h6 class="title-medium mb-0">Markets Overview</h6>
+  </div>
+  <div class="card-body">
+    <canvas id="marketsChart" height="100"></canvas>
+  </div>
+</div>
+
+<!-- Markets Table -->
+<div class="dashboard-card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h6 class="title-medium mb-0">All Markets</h6>
+    <a href="{% url 'admin_dashboard:add-market' %}" class="btn btn-primary">
+      <i class="fas fa-plus me-1"></i> Add Market
+    </a>
+  </div>
+  <div class="card-body p-0">
+    {% if markets %}
+      <div class="table-responsive">
+        <table class="data-table table mb-0">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Location</th>
+              <th>Zones</th>
+              <th>Delivery Zones</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for market in markets %}
+            <tr>
+              <td class="title-medium">{{ market.name }}</td>
+              <td>{{ market.location|default:"—" }}</td>
+              <td>{{ market.active_zones_count }} / {{ market.zones.count }}</td>
+              <td>{{ market.active_delivery_zones_count }}/ {{ market.delivery_zones.count }}</td>
+              <td>
+                {% if market.is_active %}
+                  <span class="chip chip-success">Active</span>
+                {% else %}
+                  <span class="chip chip-error">Inactive</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'admin_dashboard:edit-market' market.id %}" class="btn btn-outline-primary btn-sm me-1">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'admin_dashboard:manage-market-zones' market.id %}" class="btn btn-outline-secondary btn-sm me-1">
+                  <i class="fas fa-store"></i>
+                </a>
+                <a href="{% url 'admin_dashboard:manage-delivery-zones' market.id %}" class="btn btn-outline-info btn-sm me-1">
+                  <i class="fas fa-truck"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-store"></i>
+        <p>No markets found. <a href="{% url 'admin_dashboard:add-market' %}">Add your first market</a>.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

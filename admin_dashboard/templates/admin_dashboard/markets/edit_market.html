@@ -1,0 +1,111 @@
+<!-- admin_dashboard/templates/admin_dashboard/markets/edit_market.html -->
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Edit Market - {{ market.name }}{% endblock %}
+{% block page_title %}Edit Market{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h6 class="title-medium mb-0">Edit: {{ market.name }}</h6>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label body-medium">Market Name *</label>
+            <input type="text" name="name" class="form-control" value="{{ market.name }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label body-medium">Location</label>
+            <input type="text" name="location" class="form-control" value="{{ market.location|default:'' }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label body-medium">Description</label>
+            <textarea name="description" class="form-control" rows="3">{{ market.description }}</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label body-medium">Address</label>
+            <textarea name="address" class="form-control" rows="2">{{ market.address }}</textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label body-medium">Contact Phone</label>
+              <input type="text" name="contact_phone" class="form-control" value="{{ market.contact_phone }}">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label body-medium">Market Days</label>
+              <input type="text" name="market_days" class="form-control" value="{{ market.market_days }}">
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Update Market</button>
+            <a href="{% url 'admin_dashboard:manage-markets' %}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h6 class="title-medium mb-0">Location & Hours</h6>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label body-medium">Latitude</label>
+          <input type="number" step="0.000001" name="latitude" class="form-control" value="{{ market.latitude|default:'' }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label body-medium">Longitude</label>
+          <input type="number" step="0.000001" name="longitude" class="form-control" value="{{ market.longitude|default:'' }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label body-medium">Opening Time</label>
+          <input type="time" name="opening_time" class="form-control" value="{{ market.opening_time|time:'H:i' }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label body-medium">Closing Time</label>
+          <input type="time" name="closing_time" class="form-control" value="{{ market.closing_time|time:'H:i' }}">
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="is_active" id="is_active" {% if market.is_active %}checked{% endif %}>
+          <label class="form-check-label body-medium" for="is_active">Active Market</label>
+        </div>
+        
+        <!-- Market Zones -->
+        <div class="mt-4">
+          <h6 class="title-small mb-2">Market Zones</h6>
+          {% if market.zones.all %}
+            <div class="d-flex flex-wrap gap-1 mb-2">
+              {% for zone in market.zones.all %}
+                <span class="chip chip-primary">{{ zone.name }}</span>
+              {% endfor %}
+            </div>
+            <a href="{% url 'admin_dashboard:manage-market-zones' market.id %}" class="btn btn-outline-primary btn-sm w-100">Manage Zones</a>
+          {% else %}
+            <p class="body-small text-muted">No zones defined.</p>
+            <a href="{% url 'admin_dashboard:add-market-zone' market.id %}" class="btn btn-outline-primary btn-sm w-100">Add Zone</a>
+          {% endif %}
+        </div>
+
+        <!-- ✅ NEW: Delivery Zones -->
+        <div class="mt-4">
+          <h6 class="title-small mb-2">Delivery Zones</h6>
+          {% if market.delivery_zones.all %}
+            <p class="body-medium">{{ market.delivery_zones.count }} zones configured</p>
+          {% else %}
+            <p class="body-small text-muted">No delivery zones.</p>
+          {% endif %}
+          <a href="{% url 'admin_dashboard:manage-delivery-zones' market.id %}" class="btn btn-outline-primary btn-sm w-100 mt-2">
+            Manage Delivery Zones
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
