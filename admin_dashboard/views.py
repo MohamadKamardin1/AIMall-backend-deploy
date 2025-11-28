@@ -1826,8 +1826,8 @@ from django.contrib.auth import login
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
-from .models import User, Customer, Vendor, Driver, AdminProfile, SecurityQuestion, UserSecurityAnswer
-from .serializers import (
+from accounts.models import User, Customer, Vendor, Driver, AdminProfile, SecurityQuestion, UserSecurityAnswer
+from accounts.serializers import (
     CustomerRegistrationSerializer, VendorRegistrationSerializer,
     LoginSerializer, CustomerProfileSerializer, VendorProfileSerializer,
     ChangePasswordSerializer, PasswordResetRequestSerializer,
