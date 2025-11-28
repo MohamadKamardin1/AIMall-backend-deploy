@@ -142,20 +142,7 @@ WSGI_APPLICATION = 'AIMall.wsgi.application'
 LOGIN_URL = '/accounts/login/'  # Default fallback
 LOGOUT_REDIRECT_URL = '/'
 
-# Or create custom login handling
-import django
-from django.contrib.auth.views import redirect_to_login
-from django.urls import reverse
 
-# Custom function to handle login redirects based on user type
-def get_login_redirect(request):
-    """Determine login redirect based on the requested path"""
-    if request.path.startswith('/vendor/'):
-        return '/vendor/login/'
-    elif request.path.startswith('/admin/'):
-        return '/admin/login/'
-    else:
-        return '/accounts/login/'
 # Database configuration for Render
 DATABASES = {
     'default': dj_database_url.config(
