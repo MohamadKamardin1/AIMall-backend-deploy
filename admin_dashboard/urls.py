@@ -5,6 +5,11 @@ from . import views
 app_name = 'admin_dashboard'
 
 urlpatterns = [
+
+    path('login/', views.admin_login_view, name='login'),
+    path('logout/', views.admin_logout_view, name='logout'), 
+
+
     # Dashboard
     path('', views.dashboard, name='dashboard'),
     

@@ -18,15 +18,60 @@ from products.models import Category, MeasurementUnitType, ProductAddonMapping, 
 from markets.models import Market, MarketZone
 from order.models import Order, OrderItem
 
+# In admin_dashboard/views.py (add this at the top section with other imports)
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.urls import reverse
+
+from .decorators import admin_required
 # ============================================
 # HELPER FUNCTION
 # ============================================
 def is_admin(user):
     return user.is_authenticated and user.user_type == 'admin'
 
+
+
+
+def admin_login_view(request):
+    if request.method == 'POST':
+        phone = request.POST.get('phone_number')
+        password = request.POST.get('password')
+        
+        # Authenticate using phone number (assuming your User model uses phone as username)
+        user = authenticate(request, username=phone, password=password)
+        
+        if user is not None:
+            if user.is_active and user.user_type == 'admin':
+                login(request, user)
+                next_url = request.GET.get('next', 'admin_dashboard:dashboard')
+                return redirect(next_url)
+            else:
+                messages.error(request, "Access denied. Admin privileges required.")
+        else:
+            messages.error(request, "Invalid phone number or password.")
+    
+    return render(request, 'admin_dashboard/auth/login.html')
+
+
+
+from django.contrib.auth import logout
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def admin_logout_view(request):
+    if request.method == 'POST':
+        logout(request)
+        messages.success(request, "You've been logged out successfully.")
+        return redirect('home')  # Redirect to your homepage
+    # Show confirmation page on GET
+    return render(request, 'admin_dashboard/auth/logout_confirm.html')
 # ============================================
 # DASHBOARD
 # ============================================
+@admin_required
 @login_required
 @user_passes_test(is_admin)
 def dashboard(request):

@@ -139,8 +139,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'AIMall.wsgi.application'
 
 # Login settings for multiple dashboards
-LOGIN_URL = '/accounts/login/'  # Default fallback
-LOGOUT_REDIRECT_URL = '/'
 
 
 # Database configuration for Render
